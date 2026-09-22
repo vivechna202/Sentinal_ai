@@ -1,0 +1,12 @@
+[project]
+name = "sentinel-ai-agent"
+version = "0.1.0"
+description = "A custom coding agent powered by Gemini"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "duckduckgo-search>=8.1.1",
+    "google-genai>=2.24.0",
+    "python-dotenv>=1.2.3",
+    "streamlit>=1.64.0",
+]
