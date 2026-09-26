@@ -54,17 +54,7 @@ def _run_automated_tests(path: str, verify_command: str = None) -> str:
         except Exception as e:
             feedback += f"❌ Error running verification command: {str(e)}"
             
-    # 3. Automated Git Checkpointing
-    try:
-        # Check if git is initialized
-        if not os.path.exists(".git"):
-            subprocess.run("git init", shell=True, capture_output=True)
-            
-        subprocess.run(f'git add "{path}"', shell=True, capture_output=True)
-        subprocess.run(f'git commit -m "Auto-checkpoint: Edited {os.path.basename(path)}"', shell=True, capture_output=True)
-        feedback += "\n\n💾 Auto-checkpoint saved to Git."
-    except Exception:
-        pass
+    # Auto-checkpointing has been removed as per user request.
     
     return feedback
 
