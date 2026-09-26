@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel AI</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f0f11',
+                        chat: '#1e1e24',
+                        user: '#2a2a36',
+                        accent: '#ff4b4b'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Use marked.js to render markdown to HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Essential Markdown styling for parsed content */
+        .markdown-body pre { background-color: #111; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .markdown-body code { background-color: #111; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace; }
+        .markdown-body p { margin-bottom: 0.75rem; }
+        .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    </style>
+</head>
+<body class="bg-dark text-gray-200 font-sans h-screen flex flex-col m-0 p-0 overflow-hidden">
+
+    <!-- Header -->
+    <div class="w-full p-4 bg-chat border-b border-gray-800 flex items-center shadow-md z-10">
+        <h2 class="text-xl font-bold tracking-wide">🤖 Sentinel AI <span class="text-xs text-gray-500 font-normal ml-2">(SWE-Agent)</span></h2>
+    </div>
+
+    <!-- Chat Container -->
+    <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-6">
+        <!-- Messages will be injected here -->
+    </div>
+
+    <!-- Input Area -->
+    <div class="w-full p-4 bg-dark border-t border-gray-800 flex gap-4 items-end z-10">
+        <textarea 
+            id="prompt-input" 
+            rows="1" 
+            class="flex-1 bg-chat text-gray-200 border border-gray-700 rounded-lg p-3 text-base resize-none focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors max-h-[200px] overflow-y-auto"
+            placeholder="How can I help you build today? (Shift+Enter for new line)"></textarea>
+        
+        <button id="send-btn" class="bg-accent hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg">
+            Send
+        </button>
+        <button id="stop-btn" class="hidden bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg">
+            Stop
+        </button>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const promptInput = document.getElementById('prompt-input');
+        const sendBtn = document.getElementById('send-btn');
+        const stopBtn = document.getElementById('stop-btn');
+
+        // Auto-resize textarea
+        promptInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Handle Enter key (but allow Shift+Enter for new lines)
+        promptInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+        stopBtn.addEventListener('click', stopGeneration);
+
+        async function loadHistory() {
+            const res = await fetch('/history');
+            const data = await res.json();
+            data.messages.forEach(msg => appendMessage(msg.role, msg.content));
+        }
+
+        function appendMessage(role, content) {
+            const msgDiv = document.createElement('div');
+            
+            // Tailwind classes for alignment and styling
+            const baseClasses = "max-w-[85%] md:max-w-[75%] p-4 rounded-xl leading-relaxed markdown-body shadow-sm";
+            if (role === 'user') {
+                msgDiv.className = `${baseClasses} self-end bg-user text-gray-100`;
+            } else {
+                msgDiv.className = `${baseClasses} self-start bg-chat border border-gray-800 text-gray-300`;
+            }
+            
+            msgDiv.innerHTML = marked.parse(content);
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return msgDiv;
+        }
+
+        async function sendMessage() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+
+            promptInput.value = '';
+            promptInput.style.height = 'auto';
+            
+            appendMessage('user', prompt);
+            
+            sendBtn.classList.add('hidden');
+            stopBtn.classList.remove('hidden');
+            
+            const aiMsgDiv = document.createElement('div');
+            aiMsgDiv.className = "max-w-[85%] md:max-w-[75%] p-4 rounded-xl leading-relaxed markdown-body shadow-sm self-start bg-chat border border-gray-800 text-gray-300";
+            aiMsgDiv.innerHTML = "<em class='text-gray-500 animate-pulse'>Thinking and working...</em>";
+            chatContainer.appendChild(aiMsgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            let fullResponse = "";
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt: prompt})
+                });
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                
+                aiMsgDiv.innerHTML = "";
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, {stream: true});
+                    const lines = chunk.split('\n\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') {
+                                break;
+                            } else if (data === '[STOPPED BY USER]') {
+                                fullResponse += "\n\n*[Stopped by user]*";
+                            } else {
+                                try {
+                                    const parsed = JSON.parse(data);
+                                    if (parsed.text) fullResponse += parsed.text;
+                                    if (parsed.error) fullResponse += `\n\n**Error:** ${parsed.error}`;
+                                } catch (e) {}
+                            }
+                            aiMsgDiv.innerHTML = marked.parse(fullResponse);
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        }
+                    }
+                }
+            } catch (e) {
+                aiMsgDiv.innerHTML += `<br><span class="text-red-500 font-bold">Connection error: ${e.message}</span>`;
+            } finally {
+                sendBtn.classList.remove('hidden');
+                stopBtn.classList.add('hidden');
+            }
+        }
+
+        async function stopGeneration() {
+            await fetch('/stop', { method: 'POST' });
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>

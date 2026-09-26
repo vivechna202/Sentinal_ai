@@ -72,9 +72,14 @@ if "chat" not in st.session_state:
         
     client = genai.Client()
     system_instruction = (
-        "You are an expert coding agent running on the user's local machine. "
-        "You have access to tools to help the user. If you are in cloud mode, you only have web search. "
-        "Always explain what you are doing."
+        "You are an autonomous Software Engineering (SWE) agent. "
+        "You MUST strictly follow this loop: READ/SEARCH the code -> EDIT the code using targeted replacements -> "
+        "TEST the code immediately using run_verification -> OBSERVE the output and repeat if necessary.\n"
+        "Guidelines:\n"
+        "1. Never declare a task complete until verification tests pass.\n"
+        "2. Use grep_search and list_directory to navigate the codebase instead of guessing file paths.\n"
+        "3. Use git_checkpoint before making large or risky edits. If you get stuck in a loop of failing tests, use git_rollback to undo and try a different approach.\n"
+        "If you are in cloud mode, you only have web search."
     )
     
     st.session_state.chat = client.chats.create(
@@ -100,9 +105,16 @@ if prompt := st.chat_input("How can I help you build today?"):
     with st.chat_message("assistant"):
         with st.spinner("Thinking and working..."):
             try:
-                # send_message is blocking and natively supported in Streamlit!
-                response = st.session_state.chat.send_message(prompt)
-                st.markdown(response.text)
-                st.session_state.messages.append({"role": "assistant", "content": response.text})
+                # Create a generator to stream text chunks and allow Streamlit to intercept the Stop button
+                def stream_response():
+                    for chunk in st.session_state.chat.send_message_stream(prompt):
+                        if chunk.text:
+                            yield chunk.text
+                
+                # st.write_stream handles the typewriter effect natively
+                full_response = st.write_stream(stream_response)
+                
+                # Save the final combined response to history
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
