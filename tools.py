@@ -24,7 +24,7 @@ def _run_automated_tests(path: str, verify_command: str = None) -> str:
     if path.endswith(".py"):
         try:
             result = subprocess.run(
-                f'python -m py_compile "{path}"', 
+                f'python -m py_compile \"{path}\"', 
                 shell=True, capture_output=True, text=True
             )
             if result.returncode != 0:
