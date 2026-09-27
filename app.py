@@ -33,6 +33,12 @@ class PromptRequest(BaseModel):
     prompt: str
     session_id: str
 
+class EditTitleRequest(BaseModel):
+    title: str
+
+class EditPinRequest(BaseModel):
+    pinned: bool
+
 def load_chats_db():
     if os.path.exists(CHATS_FILE):
         with open(CHATS_FILE, 'r', encoding='utf-8') as f:
@@ -103,10 +109,45 @@ async def get_sessions():
     db = load_chats_db()
     sessions = []
     for sid, data in db.items():
-        sessions.append({"id": sid, "title": data["title"], "updated_at": data["updated_at"]})
-    # Sort by updated_at descending
-    sessions.sort(key=lambda x: x["updated_at"], reverse=True)
+        sessions.append({
+            "id": sid, 
+            "title": data.get("title", "Untitled"), 
+            "updated_at": data.get("updated_at", ""),
+            "pinned": data.get("pinned", False)
+        })
+    # Sort by pinned (True first), then by updated_at (descending)
+    sessions.sort(key=lambda x: (x["pinned"], x["updated_at"]), reverse=True)
     return {"sessions": sessions}
+
+@app.put("/sessions/{session_id}/title")
+async def update_session_title(session_id: str, request: EditTitleRequest):
+    db = load_chats_db()
+    if session_id in db:
+        db[session_id]["title"] = request.title
+        save_chats_db(db)
+        return {"status": "success"}
+    return JSONResponse(status_code=404, content={"error": "Session not found"})
+
+@app.put("/sessions/{session_id}/pin")
+async def update_session_pin(session_id: str, request: EditPinRequest):
+    db = load_chats_db()
+    if session_id in db:
+        db[session_id]["pinned"] = request.pinned
+        save_chats_db(db)
+        return {"status": "success"}
+    return JSONResponse(status_code=404, content={"error": "Session not found"})
+
+@app.delete("/sessions/{session_id}")
+async def delete_session(session_id: str):
+    db = load_chats_db()
+    if session_id in db:
+        del db[session_id]
+        save_chats_db(db)
+        # If active session deleted, remove from memory
+        if session_id in active_sessions:
+            del active_sessions[session_id]
+        return {"status": "success"}
+    return JSONResponse(status_code=404, content={"error": "Session not found"})
 
 @app.post("/sessions")
 async def create_session():
@@ -159,6 +200,12 @@ async def chat(request: PromptRequest):
                     yield "data: [STOPPED BY USER]\n\n"
                     full_response += "\n\n*[Stopped by user]*"
                     break
+                    
+                # Intercept background tool executions
+                if getattr(chunk, 'function_calls', None):
+                    for fc in chunk.function_calls:
+                        yield f"data: {json.dumps({'tool': fc.name})}\n\n"
+                        
                 if chunk.text:
                     full_response += chunk.text
                     yield f"data: {json.dumps({'text': chunk.text})}\n\n"

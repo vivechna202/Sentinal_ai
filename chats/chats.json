@@ -1,29 +1,11 @@
 {
-    "817e453f-4d6f-4894-b285-50fc107e8f32": {
+    "d20eab32-aaf8-488a-9f8f-d04a281d6e04": {
         "title": "New Chat",
-        "updated_at": "2026-09-27T07:55:06.236111",
+        "updated_at": "2026-09-27T09:05:54.987878",
         "history": [
             {
                 "role": "assistant",
                 "content": "Hello! I am your SWE-agent. How can I help you build today?"
-            }
-        ]
-    },
-    "767b8756-8b0b-40b3-9442-d89578ab0f9e": {
-        "title": "i want to know how coding agen...",
-        "updated_at": "2026-09-27T07:55:49.592861",
-        "history": [
-            {
-                "role": "assistant",
-                "content": "Hello! I am your SWE-agent. How can I help you build today?"
-            },
-            {
-                "role": "user",
-                "content": "i want to know how coding agents work"
-            },
-            {
-                "role": "assistant",
-                "content": ""
             }
         ]
     }
