@@ -15,7 +15,8 @@
                         dark: '#0f0f11',
                         chat: '#1e1e24',
                         user: '#2a2a36',
-                        accent: '#ff4b4b'
+                        accent: '#ff4b4b',
+                        sidebar: '#18181f'
                     }
                 }
             }
@@ -30,34 +31,83 @@
         .markdown-body p { margin-bottom: 0.75rem; }
         .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
         .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
-<body class="bg-dark text-gray-200 font-sans h-screen flex flex-col m-0 p-0 overflow-hidden">
+<body class="bg-dark text-gray-200 font-sans h-screen flex m-0 p-0 overflow-hidden">
 
-    <!-- Header -->
-    <div class="w-full p-4 bg-chat border-b border-gray-800 flex items-center shadow-md z-10">
-        <h2 class="text-xl font-bold tracking-wide">🤖 Sentinel AI <span class="text-xs text-gray-500 font-normal ml-2">(SWE-Agent)</span></h2>
+    <!-- Sidebar -->
+    <div class="w-64 bg-sidebar border-r border-gray-800 flex flex-col z-20 hidden md:flex">
+        <div class="p-4 border-b border-gray-800">
+            <button id="new-chat-btn" class="w-full bg-accent hover:bg-red-500 text-white font-bold py-2 px-4 rounded transition-colors shadow flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                New Chat
+            </button>
+        </div>
+        <div id="sidebar-sessions" class="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
+            <!-- Session links injected here -->
+        </div>
     </div>
 
-    <!-- Chat Container -->
-    <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-6">
-        <!-- Messages will be injected here -->
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col h-screen relative">
+        <!-- Header -->
+        <div class="w-full p-4 bg-chat border-b border-gray-800 flex items-center justify-between shadow-md z-10">
+            <h2 class="text-xl font-bold tracking-wide">🤖 Sentinel AI <span class="text-xs text-gray-500 font-normal ml-2">(SWE-Agent)</span></h2>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="md:hidden text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Chat Container -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-6">
+            <!-- Messages will be injected here -->
+        </div>
+
+        <!-- Input Area -->
+        <div class="w-full p-4 bg-dark border-t border-gray-800 flex gap-4 items-end z-10">
+            <textarea 
+                id="prompt-input" 
+                rows="1" 
+                class="flex-1 bg-chat text-gray-200 border border-gray-700 rounded-lg p-3 text-base resize-none focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors max-h-[200px] overflow-y-auto"
+                placeholder="How can I help you build today? (Shift+Enter for new line)"></textarea>
+            
+            <button id="send-btn" class="bg-accent hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg">
+                Send
+            </button>
+            <button id="stop-btn" class="hidden bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg">
+                Stop
+            </button>
+        </div>
     </div>
 
-    <!-- Input Area -->
-    <div class="w-full p-4 bg-dark border-t border-gray-800 flex gap-4 items-end z-10">
-        <textarea 
-            id="prompt-input" 
-            rows="1" 
-            class="flex-1 bg-chat text-gray-200 border border-gray-700 rounded-lg p-3 text-base resize-none focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors max-h-[200px] overflow-y-auto"
-            placeholder="How can I help you build today? (Shift+Enter for new line)"></textarea>
-        
-        <button id="send-btn" class="bg-accent hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg">
-            Send
-        </button>
-        <button id="stop-btn" class="hidden bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg">
-            Stop
-        </button>
+    <!-- Mobile Sidebar Overlay (hidden by default) -->
+    <div id="mobile-sidebar" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden flex">
+        <div class="w-64 bg-sidebar h-full shadow-xl flex flex-col">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <button id="mobile-new-chat-btn" class="bg-accent hover:bg-red-500 text-white font-bold py-2 px-4 rounded transition-colors shadow flex items-center justify-center gap-2 flex-1">
+                    New Chat
+                </button>
+                <button id="close-mobile-menu" class="ml-4 text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="mobile-sidebar-sessions" class="flex-1 overflow-y-auto p-2 flex flex-col gap-1"></div>
+        </div>
+        <div class="flex-1" id="mobile-sidebar-backdrop"></div>
     </div>
 
     <script>
@@ -65,6 +115,15 @@
         const promptInput = document.getElementById('prompt-input');
         const sendBtn = document.getElementById('send-btn');
         const stopBtn = document.getElementById('stop-btn');
+        const sidebarSessions = document.getElementById('sidebar-sessions');
+        const mobileSidebarSessions = document.getElementById('mobile-sidebar-sessions');
+        
+        let currentSessionId = localStorage.getItem('sentinel_session_id');
+
+        // Mobile Menu Logic
+        document.getElementById('mobile-menu-btn').onclick = () => document.getElementById('mobile-sidebar').classList.remove('hidden');
+        document.getElementById('close-mobile-menu').onclick = () => document.getElementById('mobile-sidebar').classList.add('hidden');
+        document.getElementById('mobile-sidebar-backdrop').onclick = () => document.getElementById('mobile-sidebar').classList.add('hidden');
 
         // Auto-resize textarea
         promptInput.addEventListener('input', function() {
@@ -82,17 +141,88 @@
 
         sendBtn.addEventListener('click', sendMessage);
         stopBtn.addEventListener('click', stopGeneration);
+        document.getElementById('new-chat-btn').addEventListener('click', createNewChat);
+        document.getElementById('mobile-new-chat-btn').addEventListener('click', () => { createNewChat(); document.getElementById('mobile-sidebar').classList.add('hidden'); });
 
-        async function loadHistory() {
-            const res = await fetch('/history');
+        async function init() {
+            await loadSidebar();
+            if (!currentSessionId) {
+                await createNewChat();
+            } else {
+                await loadHistory(currentSessionId);
+            }
+        }
+
+        async function createNewChat() {
+            const res = await fetch('/sessions', { method: 'POST' });
+            const data = await res.json();
+            currentSessionId = data.id;
+            localStorage.setItem('sentinel_session_id', currentSessionId);
+            await loadSidebar();
+            await loadHistory(currentSessionId);
+        }
+
+        async function loadSidebar() {
+            const res = await fetch('/sessions');
+            const data = await res.json();
+            
+            const renderLinks = (container) => {
+                container.innerHTML = '';
+                data.sessions.forEach(session => {
+                    const btn = document.createElement('button');
+                    btn.className = `w-full text-left px-3 py-3 rounded text-sm truncate transition-colors ${session.id === currentSessionId ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`;
+                    btn.innerText = session.title;
+                    btn.onclick = () => {
+                        currentSessionId = session.id;
+                        localStorage.setItem('sentinel_session_id', currentSessionId);
+                        loadSidebar(); // Refresh active state
+                        loadHistory(currentSessionId);
+                        document.getElementById('mobile-sidebar').classList.add('hidden');
+                    };
+                    container.appendChild(btn);
+                });
+            };
+            
+            renderLinks(sidebarSessions);
+            renderLinks(mobileSidebarSessions);
+        }
+
+        async function loadHistory(sessionId) {
+            chatContainer.innerHTML = ''; // clear chat
+            const res = await fetch(`/history/${sessionId}`);
+            if (res.status === 404) {
+                await createNewChat();
+                return;
+            }
             const data = await res.json();
             data.messages.forEach(msg => appendMessage(msg.role, msg.content));
+        }
+
+        function addCopyButtons(el) {
+            el.querySelectorAll('pre').forEach(pre => {
+                if (pre.parentNode.classList.contains('relative')) return;
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'relative group my-2';
+                
+                const btn = document.createElement('button');
+                btn.className = 'absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-xs text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer';
+                btn.innerText = 'Copy';
+                btn.onclick = () => {
+                    navigator.clipboard.writeText(pre.innerText);
+                    btn.innerText = 'Copied!';
+                    setTimeout(() => btn.innerText = 'Copy', 2000);
+                };
+                
+                pre.parentNode.insertBefore(wrapper, pre);
+                wrapper.appendChild(btn);
+                wrapper.appendChild(pre);
+            });
         }
 
         function appendMessage(role, content) {
             const msgDiv = document.createElement('div');
             
-            // Tailwind classes for alignment and styling
             const baseClasses = "max-w-[85%] md:max-w-[75%] p-4 rounded-xl leading-relaxed markdown-body shadow-sm";
             if (role === 'user') {
                 msgDiv.className = `${baseClasses} self-end bg-user text-gray-100`;
@@ -101,6 +231,7 @@
             }
             
             msgDiv.innerHTML = marked.parse(content);
+            addCopyButtons(msgDiv);
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             return msgDiv;
@@ -130,7 +261,7 @@
                 const response = await fetch('/chat', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({prompt: prompt})
+                    body: JSON.stringify({prompt: prompt, session_id: currentSessionId})
                 });
                 
                 const reader = response.body.getReader();
@@ -160,10 +291,13 @@
                                 } catch (e) {}
                             }
                             aiMsgDiv.innerHTML = marked.parse(fullResponse);
+                            addCopyButtons(aiMsgDiv);
                             chatContainer.scrollTop = chatContainer.scrollHeight;
                         }
                     }
                 }
+                // Refresh sidebar after first message to update the auto-generated title
+                loadSidebar();
             } catch (e) {
                 aiMsgDiv.innerHTML += `<br><span class="text-red-500 font-bold">Connection error: ${e.message}</span>`;
             } finally {
@@ -176,7 +310,8 @@
             await fetch('/stop', { method: 'POST' });
         }
 
-        loadHistory();
+        // Run initialization
+        init();
     </script>
 </body>
 </html>

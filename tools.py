@@ -59,18 +59,28 @@ def _run_automated_tests(path: str, verify_command: str = None) -> str:
     return feedback
 
 
-def create_file(path: str, content: str, verify_command: str = None) -> str:
+def create_file(path: str, content: str, verify_command: str = None, approved: bool = False) -> str:
     """Creates a BRAND NEW file with the given content.
     Do NOT use this to edit existing files.
+    WARNING: You MUST ask the user for permission in the chat first! Once they say yes, call this tool again with approved=True.
     
     Args:
         path: The path to the new file.
         content: The initial text content.
         verify_command: Optional terminal command to run tests/linters immediately after creation.
+        approved: Set to True ONLY if the user explicitly told you to create this file.
         
     Returns:
-        A success message combined with automated test results.
+        A success message combined with automated test results, or a rejection message if not approved.
     """
+    if not approved:
+        return (
+            "❌ ACTION BLOCKED: You MUST output a message to the user asking for permission to create this file. "
+            f"File: {path}\n"
+            "Wait for them to reply 'yes' or 'approved'. "
+            "Then, call this tool again with `approved=True`."
+        )
+
     try:
         if os.path.exists(path):
             return "Error: File already exists. You MUST use edit_file to modify existing files."
@@ -85,19 +95,29 @@ def create_file(path: str, content: str, verify_command: str = None) -> str:
     except Exception as e:
         return f"Error creating file: {str(e)}"
 
-def edit_file(path: str, target_text: str, replacement_text: str, verify_command: str = None) -> str:
+def edit_file(path: str, target_text: str, replacement_text: str, verify_command: str = None, approved: bool = False) -> str:
     """Edits an existing file by replacing a specific block of text.
     Use this for precise edits rather than full-file rewrites.
+    WARNING: You MUST ask the user for permission in the chat first! Once they say yes, call this tool again with approved=True.
     
     Args:
         path: The path to the file to edit.
         target_text: The EXACT text block in the file you want to replace.
         replacement_text: The text you want to insert in its place.
         verify_command: Optional terminal command to run tests/linters immediately after editing.
+        approved: Set to True ONLY if the user explicitly told you to edit this file.
         
     Returns:
-        A success message combined with automated test results.
+        A success message combined with automated test results, or a rejection message if not approved.
     """
+    if not approved:
+        return (
+            "❌ ACTION BLOCKED: You MUST output a message to the user asking for permission to edit this file. "
+            f"File: {path}\n"
+            "Wait for them to reply 'yes' or 'approved'. "
+            "Then, call this tool again with `approved=True`."
+        )
+
     try:
         with open(path, 'r', encoding='utf-8') as f:
             content = f.read()
@@ -215,22 +235,39 @@ def grep_search(query: str, directory: str = ".") -> str:
     except Exception as e:
         return f"Error searching: {str(e)}"
 
-def git_checkpoint(message: str) -> str:
+def git_checkpoint(message: str, files_to_commit: list[str] = None, approved: bool = False) -> str:
     """Creates a Git commit to save the current state of the code safely.
     Call this BEFORE making risky edits or large refactors!
+    WARNING: You MUST ask the user for permission in the chat first! Once they say yes, call this tool again with approved=True.
     
     Args:
         message: A brief description of the current working state.
+        files_to_commit: A list of specific file paths to commit. If empty, commits all modified files.
+        approved: Set to True ONLY if the user explicitly told you to commit to Git.
         
     Returns:
-        Success or failure message.
+        Success or failure message, or a rejection message if not approved.
     """
+    if not approved:
+        files_list = ", ".join(files_to_commit) if files_to_commit else "ALL modified files"
+        return (
+            "❌ ACTION BLOCKED: You MUST output a message to the user asking for permission to commit these files to Git. "
+            f"Files to commit: {files_list}\n"
+            "Wait for them to reply 'yes' or 'approved'. "
+            "Then, call this tool again with `approved=True`."
+        )
+
     try:
         # Check if git is initialized
         if not os.path.exists(".git"):
             subprocess.run("git init", shell=True, capture_output=True)
             
-        subprocess.run("git add .", shell=True, capture_output=True)
+        if files_to_commit:
+            for file in files_to_commit:
+                subprocess.run(f'git add "{file}"', shell=True, capture_output=True)
+        else:
+            subprocess.run("git add .", shell=True, capture_output=True)
+            
         result = subprocess.run(f'git commit -m "Agent Checkpoint: {message}"', shell=True, capture_output=True, text=True)
         return "Checkpoint saved! You can now safely edit. If you break it, use git_rollback."
     except Exception as e:
