@@ -1,0 +1,1254 @@
+{
+    "directories": [
+        "templates"
+    ],
+    "source_files": [
+        "README.md",
+        "test_impact.py",
+        "templates\\index.html"
+    ],
+    "config_files": [
+        "app.py",
+        "pyproject.toml",
+        "tools.py"
+    ],
+    "other_files": [
+        "install.bat",
+        "uv.lock"
+    ],
+    "by_extension": {
+        ".py": [
+            "app.py",
+            "test_impact.py",
+            "tools.py"
+        ],
+        ".bat": [
+            "install.bat"
+        ],
+        ".toml": [
+            "pyproject.toml"
+        ],
+        ".md": [
+            "README.md"
+        ],
+        ".lock": [
+            "uv.lock"
+        ],
+        ".html": [
+            "templates\\index.html"
+        ]
+    },
+    "python_ast": {
+        "app.py": {
+            "classes": {
+                "PromptRequest": {
+                    "line": 32,
+                    "bases": [
+                        "BaseModel"
+                    ],
+                    "methods": []
+                },
+                "EditTitleRequest": {
+                    "line": 36,
+                    "bases": [
+                        "BaseModel"
+                    ],
+                    "methods": []
+                },
+                "EditPinRequest": {
+                    "line": 39,
+                    "bases": [
+                        "BaseModel"
+                    ],
+                    "methods": []
+                }
+            },
+            "functions": {
+                "load_chats_db": {
+                    "line": 42,
+                    "args": [],
+                    "decorators": [],
+                    "calls": [
+                        "*.exists",
+                        "open",
+                        "json.load"
+                    ]
+                },
+                "save_chats_db": {
+                    "line": 48,
+                    "args": [
+                        "db"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "open",
+                        "json.dump"
+                    ]
+                },
+                "get_config": {
+                    "line": 52,
+                    "args": [],
+                    "decorators": [],
+                    "calls": [
+                        "*.get",
+                        "types.GenerateContentConfig"
+                    ]
+                },
+                "init_client": {
+                    "line": 71,
+                    "args": [],
+                    "decorators": [],
+                    "calls": [
+                        "*.get",
+                        "genai.Client"
+                    ]
+                },
+                "get_or_create_session": {
+                    "line": 79,
+                    "args": [
+                        "session_id"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "*.create",
+                        "*.from_text",
+                        "*.startswith",
+                        "types.Content",
+                        "gemini_history.append",
+                        "init_client",
+                        "load_chats_db",
+                        "get_config"
+                    ]
+                },
+                "index": {
+                    "line": 106,
+                    "args": [
+                        "request"
+                    ],
+                    "decorators": [
+                        "app.get('/')"
+                    ],
+                    "calls": [
+                        "app.get",
+                        "templates.TemplateResponse"
+                    ]
+                },
+                "get_sessions": {
+                    "line": 110,
+                    "args": [],
+                    "decorators": [
+                        "app.get('/sessions')"
+                    ],
+                    "calls": [
+                        "sessions.sort",
+                        "app.get",
+                        "data.get",
+                        "sessions.append",
+                        "db.items",
+                        "load_chats_db"
+                    ]
+                },
+                "update_session_title": {
+                    "line": 125,
+                    "args": [
+                        "session_id",
+                        "request"
+                    ],
+                    "decorators": [
+                        "app.put('/sessions/{session_id}/title')"
+                    ],
+                    "calls": [
+                        "save_chats_db",
+                        "load_chats_db",
+                        "app.put",
+                        "JSONResponse"
+                    ]
+                },
+                "update_session_pin": {
+                    "line": 134,
+                    "args": [
+                        "session_id",
+                        "request"
+                    ],
+                    "decorators": [
+                        "app.put('/sessions/{session_id}/pin')"
+                    ],
+                    "calls": [
+                        "save_chats_db",
+                        "load_chats_db",
+                        "app.put",
+                        "JSONResponse"
+                    ]
+                },
+                "delete_session": {
+                    "line": 143,
+                    "args": [
+                        "session_id"
+                    ],
+                    "decorators": [
+                        "app.delete('/sessions/{session_id}')"
+                    ],
+                    "calls": [
+                        "save_chats_db",
+                        "load_chats_db",
+                        "app.delete",
+                        "JSONResponse"
+                    ]
+                },
+                "create_session": {
+                    "line": 155,
+                    "args": [],
+                    "decorators": [
+                        "app.post('/sessions')"
+                    ],
+                    "calls": [
+                        "uuid.uuid4",
+                        "*.isoformat",
+                        "str",
+                        "app.post",
+                        "datetime.now",
+                        "load_chats_db",
+                        "save_chats_db"
+                    ]
+                },
+                "get_history": {
+                    "line": 167,
+                    "args": [
+                        "session_id"
+                    ],
+                    "decorators": [
+                        "app.get('/history/{session_id}')"
+                    ],
+                    "calls": [
+                        "app.get",
+                        "JSONResponse",
+                        "load_chats_db"
+                    ]
+                },
+                "chat": {
+                    "line": 174,
+                    "args": [
+                        "request"
+                    ],
+                    "decorators": [
+                        "app.post('/chat')"
+                    ],
+                    "calls": [
+                        "stop_event.clear",
+                        "len",
+                        "JSONResponse",
+                        "stop_event.is_set",
+                        "*.isoformat",
+                        "generate",
+                        "app.post",
+                        "json.dumps",
+                        "str",
+                        "datetime.now",
+                        "getattr",
+                        "chat_session.send_message_stream",
+                        "*.append",
+                        "load_chats_db",
+                        "StreamingResponse",
+                        "save_chats_db",
+                        "get_or_create_session"
+                    ]
+                },
+                "stop": {
+                    "line": 228,
+                    "args": [],
+                    "decorators": [
+                        "app.post('/stop')"
+                    ],
+                    "calls": [
+                        "app.post",
+                        "stop_event.set"
+                    ]
+                }
+            },
+            "imports": [
+                "os",
+                "json",
+                "threading",
+                "uuid",
+                "datetime.datetime",
+                "fastapi.FastAPI",
+                "fastapi.Request",
+                "fastapi.responses.StreamingResponse",
+                "fastapi.responses.JSONResponse",
+                "fastapi.templating.Jinja2Templates",
+                "pydantic.BaseModel",
+                "google.genai",
+                "google.genai.types",
+                "tools.AGENT_TOOLS",
+                "dotenv.load_dotenv"
+            ]
+        },
+        "test_impact.py": {
+            "classes": {},
+            "functions": {},
+            "imports": [
+                "tools.query_repo_index"
+            ]
+        },
+        "tools.py": {
+            "classes": {
+                "TaskState": {
+                    "line": 8,
+                    "bases": [],
+                    "methods": [
+                        {
+                            "name": "__init__",
+                            "args": [
+                                "self"
+                            ],
+                            "line": 9,
+                            "calls": [
+                                "self.load",
+                                "os.makedirs"
+                            ]
+                        },
+                        {
+                            "name": "load",
+                            "args": [
+                                "self"
+                            ],
+                            "line": 14,
+                            "calls": [
+                                "*.exists",
+                                "open",
+                                "self.reset",
+                                "json.load"
+                            ]
+                        },
+                        {
+                            "name": "reset",
+                            "args": [
+                                "self",
+                                "goal"
+                            ],
+                            "line": 24,
+                            "calls": [
+                                "uuid.uuid4",
+                                "*.isoformat",
+                                "self.save",
+                                "str",
+                                "datetime.now"
+                            ]
+                        },
+                        {
+                            "name": "save",
+                            "args": [
+                                "self"
+                            ],
+                            "line": 42,
+                            "calls": [
+                                "open",
+                                "datetime.now",
+                                "json.dump",
+                                "*.isoformat"
+                            ]
+                        },
+                        {
+                            "name": "log_tool",
+                            "args": [
+                                "self",
+                                "tool_name"
+                            ],
+                            "line": 47,
+                            "calls": [
+                                "self.save",
+                                "*.append"
+                            ]
+                        },
+                        {
+                            "name": "log_file_inspected",
+                            "args": [
+                                "self",
+                                "path"
+                            ],
+                            "line": 51,
+                            "calls": [
+                                "self.save",
+                                "*.append"
+                            ]
+                        },
+                        {
+                            "name": "log_file_modified",
+                            "args": [
+                                "self",
+                                "path"
+                            ],
+                            "line": 56,
+                            "calls": [
+                                "self.save",
+                                "*.append"
+                            ]
+                        },
+                        {
+                            "name": "log_verification",
+                            "args": [
+                                "self",
+                                "result"
+                            ],
+                            "line": 61,
+                            "calls": [
+                                "self.save",
+                                "*.append"
+                            ]
+                        },
+                        {
+                            "name": "log_error",
+                            "args": [
+                                "self",
+                                "error"
+                            ],
+                            "line": 67,
+                            "calls": [
+                                "self.save",
+                                "*.append"
+                            ]
+                        }
+                    ]
+                },
+                "RepoIndexer": {
+                    "line": 460,
+                    "bases": [],
+                    "methods": [
+                        {
+                            "name": "__init__",
+                            "args": [
+                                "self",
+                                "root_dir"
+                            ],
+                            "line": 461,
+                            "calls": [
+                                "os.makedirs"
+                            ]
+                        },
+                        {
+                            "name": "_extract_ast_info",
+                            "args": [
+                                "self",
+                                "filepath"
+                            ],
+                            "line": 468,
+                            "calls": [
+                                "ast.unparse",
+                                "set",
+                                "isinstance",
+                                "list",
+                                "extract_calls",
+                                "str",
+                                "methods.append",
+                                "hasattr",
+                                "ast.walk",
+                                "ast.parse",
+                                "calls.append",
+                                "f.read",
+                                "open",
+                                "ast.iter_child_nodes",
+                                "*.append",
+                                "decs.append"
+                            ]
+                        },
+                        {
+                            "name": "build_index",
+                            "args": [
+                                "self"
+                            ],
+                            "line": 531,
+                            "calls": [
+                                "index.get",
+                                "range",
+                                "*.splitext",
+                                "*.items",
+                                "s.split",
+                                "json.dump",
+                                "c.replace",
+                                "imp.split",
+                                "self._extract_ast_info",
+                                "len",
+                                "func_info.get",
+                                "d.startswith",
+                                "info.get",
+                                "*.append",
+                                "c.startswith",
+                                "cls_info.get",
+                                "os.walk",
+                                "*.endswith",
+                                "f.replace",
+                                "resolve_call",
+                                "m.get",
+                                "any",
+                                "target.startswith",
+                                "open",
+                                "*.relpath",
+                                "*.join",
+                                "file.endswith",
+                                "*.replace",
+                                "s.startswith",
+                                "*.lower",
+                                "file.startswith",
+                                "s_file.replace",
+                                "call_str.rsplit"
+                            ]
+                        },
+                        {
+                            "name": "query",
+                            "args": [
+                                "self",
+                                "query_type"
+                            ],
+                            "line": 674,
+                            "calls": [
+                                "index.get",
+                                "target.split",
+                                "*.items",
+                                "*.exists",
+                                "x.split",
+                                "self.build_index",
+                                "out.append",
+                                "*.strip",
+                                "len",
+                                "sorted",
+                                "indirect_impacts.discard",
+                                "info.get",
+                                "json.load",
+                                "set",
+                                "indirect_impacts.update",
+                                "query_type.startswith",
+                                "open",
+                                "*.join",
+                                "query_type.split",
+                                "*.get",
+                                "graph.get",
+                                "uncertain_impacts.update",
+                                "direct_impacts.update",
+                                "x.startswith"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "functions": {
+                "read_file": {
+                    "line": 73,
+                    "args": [
+                        "path"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "task_state.log_file_inspected",
+                        "task_state.log_error",
+                        "str",
+                        "task_state.log_tool",
+                        "f.read",
+                        "open"
+                    ]
+                },
+                "_run_automated_tests": {
+                    "line": 84,
+                    "args": [
+                        "path",
+                        "verify_command"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "path.endswith",
+                        "task_state.log_verification",
+                        "str",
+                        "output.strip",
+                        "subprocess.run",
+                        "*.strip"
+                    ]
+                },
+                "create_file": {
+                    "line": 127,
+                    "args": [
+                        "path",
+                        "content",
+                        "verify_command",
+                        "approved"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "os.makedirs",
+                        "*.abspath",
+                        "*.exists",
+                        "f.write",
+                        "task_state.log_error",
+                        "str",
+                        "task_state.log_tool",
+                        "_run_automated_tests",
+                        "*.dirname",
+                        "open",
+                        "task_state.log_file_modified"
+                    ]
+                },
+                "edit_file": {
+                    "line": 155,
+                    "args": [
+                        "path",
+                        "target_text",
+                        "replacement_text",
+                        "verify_command",
+                        "approved"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "f.write",
+                        "task_state.log_error",
+                        "str",
+                        "task_state.log_tool",
+                        "_run_automated_tests",
+                        "f.read",
+                        "open",
+                        "task_state.log_file_modified",
+                        "content.replace"
+                    ]
+                },
+                "run_verification": {
+                    "line": 186,
+                    "args": [
+                        "command"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "task_state.log_error",
+                        "task_state.log_verification",
+                        "str",
+                        "task_state.log_tool",
+                        "output.strip",
+                        "subprocess.run"
+                    ]
+                },
+                "list_directory": {
+                    "line": 220,
+                    "args": [
+                        "path"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "*.basename",
+                        "root.replace",
+                        "*.count",
+                        "task_state.log_error",
+                        "str",
+                        "task_state.log_tool",
+                        "result.append",
+                        "*.isdir",
+                        "*.join",
+                        "os.walk"
+                    ]
+                },
+                "grep_search": {
+                    "line": 255,
+                    "args": [
+                        "query",
+                        "directory"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "len",
+                        "enumerate",
+                        "os.walk",
+                        "str",
+                        "line.strip",
+                        "task_state.log_tool",
+                        "results.append",
+                        "open",
+                        "*.join",
+                        "file.endswith"
+                    ]
+                },
+                "git_checkpoint": {
+                    "line": 296,
+                    "args": [
+                        "message",
+                        "files_to_commit",
+                        "approved"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "*.exists",
+                        "task_state.log_error",
+                        "str",
+                        "task_state.log_tool",
+                        "subprocess.run",
+                        "*.join"
+                    ]
+                },
+                "git_rollback": {
+                    "line": 325,
+                    "args": [],
+                    "decorators": [],
+                    "calls": [
+                        "*.isoformat",
+                        "task_state.log_error",
+                        "task_state.save",
+                        "str",
+                        "task_state.log_tool",
+                        "datetime.now",
+                        "subprocess.run",
+                        "*.append"
+                    ]
+                },
+                "execute_command": {
+                    "line": 338,
+                    "args": [
+                        "command",
+                        "approved"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "task_state.log_error",
+                        "*.startswith",
+                        "str",
+                        "task_state.log_tool",
+                        "any",
+                        "output.strip",
+                        "command.strip",
+                        "subprocess.run"
+                    ]
+                },
+                "search_web": {
+                    "line": 371,
+                    "args": [
+                        "query"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "formatted_results.append",
+                        "str",
+                        "DDGS",
+                        "*.text",
+                        "*.join"
+                    ]
+                },
+                "run_python_code": {
+                    "line": 393,
+                    "args": [
+                        "code"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "io.StringIO",
+                        "exec",
+                        "traceback.format_exc",
+                        "redirected_output.getvalue"
+                    ]
+                },
+                "update_plan": {
+                    "line": 420,
+                    "args": [
+                        "task_goal",
+                        "steps",
+                        "files_affected",
+                        "tools_used",
+                        "verification_steps"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "os.makedirs",
+                        "task_state.save",
+                        "json.dump",
+                        "task_state.log_tool",
+                        "open",
+                        "*.join"
+                    ]
+                },
+                "update_task_status": {
+                    "line": 444,
+                    "args": [
+                        "step",
+                        "status",
+                        "completion_state"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "task_state.save",
+                        "task_state.log_tool"
+                    ]
+                },
+                "query_repo_index": {
+                    "line": 836,
+                    "args": [
+                        "query_type",
+                        "refresh"
+                    ],
+                    "decorators": [],
+                    "calls": [
+                        "RepoIndexer",
+                        "indexer.query",
+                        "indexer.build_index",
+                        "task_state.log_tool"
+                    ]
+                }
+            },
+            "imports": [
+                "os",
+                "subprocess",
+                "json",
+                "uuid",
+                "datetime.datetime",
+                "duckduckgo_search.DDGS"
+            ]
+        }
+    },
+    "dependency_graph": {
+        "outbound": {
+            "app.py": [
+                "tools.py"
+            ],
+            "test_impact.py": [
+                "tools.py"
+            ],
+            "tools.py": []
+        },
+        "inbound": {
+            "app.py": [],
+            "test_impact.py": [],
+            "tools.py": [
+                "app.py",
+                "test_impact.py"
+            ]
+        }
+    },
+    "call_graph": {
+        "outbound": {
+            "app.py::load_chats_db": [
+                "?*.exists",
+                "?open",
+                "?json.load"
+            ],
+            "app.py::save_chats_db": [
+                "?open",
+                "?json.dump"
+            ],
+            "app.py::get_config": [
+                "?*.get",
+                "?types.GenerateContentConfig"
+            ],
+            "app.py::init_client": [
+                "?*.get",
+                "?genai.Client"
+            ],
+            "app.py::get_or_create_session": [
+                "?*.create",
+                "?*.from_text",
+                "?*.startswith",
+                "?types.Content",
+                "?gemini_history.append",
+                "app.py::init_client",
+                "app.py::load_chats_db",
+                "app.py::get_config"
+            ],
+            "app.py::index": [
+                "?app.get",
+                "?templates.TemplateResponse"
+            ],
+            "app.py::get_sessions": [
+                "?sessions.sort",
+                "?app.get",
+                "?data.get",
+                "?sessions.append",
+                "?db.items",
+                "app.py::load_chats_db"
+            ],
+            "app.py::update_session_title": [
+                "app.py::save_chats_db",
+                "app.py::load_chats_db",
+                "?app.put",
+                "?JSONResponse"
+            ],
+            "app.py::update_session_pin": [
+                "app.py::save_chats_db",
+                "app.py::load_chats_db",
+                "?app.put",
+                "?JSONResponse"
+            ],
+            "app.py::delete_session": [
+                "app.py::save_chats_db",
+                "app.py::load_chats_db",
+                "?app.delete",
+                "?JSONResponse"
+            ],
+            "app.py::create_session": [
+                "?uuid.uuid4",
+                "?*.isoformat",
+                "?str",
+                "?app.post",
+                "?datetime.now",
+                "app.py::load_chats_db",
+                "app.py::save_chats_db"
+            ],
+            "app.py::get_history": [
+                "?app.get",
+                "?JSONResponse",
+                "app.py::load_chats_db"
+            ],
+            "app.py::chat": [
+                "?stop_event.clear",
+                "?len",
+                "?JSONResponse",
+                "?stop_event.is_set",
+                "?*.isoformat",
+                "?generate",
+                "?app.post",
+                "?json.dumps",
+                "?str",
+                "?datetime.now",
+                "?getattr",
+                "?chat_session.send_message_stream",
+                "?*.append",
+                "app.py::load_chats_db",
+                "?StreamingResponse",
+                "app.py::save_chats_db",
+                "app.py::get_or_create_session"
+            ],
+            "app.py::stop": [
+                "?app.post",
+                "?stop_event.set"
+            ],
+            "tools.py::read_file": [
+                "?task_state.log_file_inspected",
+                "?task_state.log_error",
+                "?str",
+                "?task_state.log_tool",
+                "?f.read",
+                "?open"
+            ],
+            "tools.py::_run_automated_tests": [
+                "?path.endswith",
+                "?task_state.log_verification",
+                "?str",
+                "?output.strip",
+                "?subprocess.run",
+                "?*.strip"
+            ],
+            "tools.py::create_file": [
+                "?os.makedirs",
+                "?*.abspath",
+                "?*.exists",
+                "?f.write",
+                "?task_state.log_error",
+                "?str",
+                "?task_state.log_tool",
+                "tools.py::_run_automated_tests",
+                "?*.dirname",
+                "?open",
+                "?task_state.log_file_modified"
+            ],
+            "tools.py::edit_file": [
+                "?f.write",
+                "?task_state.log_error",
+                "?str",
+                "?task_state.log_tool",
+                "tools.py::_run_automated_tests",
+                "?f.read",
+                "?open",
+                "?task_state.log_file_modified",
+                "?content.replace"
+            ],
+            "tools.py::run_verification": [
+                "?task_state.log_error",
+                "?task_state.log_verification",
+                "?str",
+                "?task_state.log_tool",
+                "?output.strip",
+                "?subprocess.run"
+            ],
+            "tools.py::list_directory": [
+                "?*.basename",
+                "?root.replace",
+                "?*.count",
+                "?task_state.log_error",
+                "?str",
+                "?task_state.log_tool",
+                "?result.append",
+                "?*.isdir",
+                "?*.join",
+                "?os.walk"
+            ],
+            "tools.py::grep_search": [
+                "?len",
+                "?enumerate",
+                "?os.walk",
+                "?str",
+                "?line.strip",
+                "?task_state.log_tool",
+                "?results.append",
+                "?open",
+                "?*.join",
+                "?file.endswith"
+            ],
+            "tools.py::git_checkpoint": [
+                "?*.exists",
+                "?task_state.log_error",
+                "?str",
+                "?task_state.log_tool",
+                "?subprocess.run",
+                "?*.join"
+            ],
+            "tools.py::git_rollback": [
+                "?*.isoformat",
+                "?task_state.log_error",
+                "?task_state.save",
+                "?str",
+                "?task_state.log_tool",
+                "?datetime.now",
+                "?subprocess.run",
+                "?*.append"
+            ],
+            "tools.py::execute_command": [
+                "?task_state.log_error",
+                "?*.startswith",
+                "?str",
+                "?task_state.log_tool",
+                "?any",
+                "?output.strip",
+                "?command.strip",
+                "?subprocess.run"
+            ],
+            "tools.py::search_web": [
+                "?formatted_results.append",
+                "?str",
+                "?DDGS",
+                "?*.text",
+                "?*.join"
+            ],
+            "tools.py::run_python_code": [
+                "?io.StringIO",
+                "?exec",
+                "?traceback.format_exc",
+                "?redirected_output.getvalue"
+            ],
+            "tools.py::update_plan": [
+                "?os.makedirs",
+                "?task_state.save",
+                "?json.dump",
+                "?task_state.log_tool",
+                "?open",
+                "?*.join"
+            ],
+            "tools.py::update_task_status": [
+                "?task_state.save",
+                "?task_state.log_tool"
+            ],
+            "tools.py::query_repo_index": [
+                "?RepoIndexer",
+                "?indexer.query",
+                "?indexer.build_index",
+                "?task_state.log_tool"
+            ],
+            "tools.py::TaskState.__init__": [
+                "tools.py::TaskState.load",
+                "?os.makedirs"
+            ],
+            "tools.py::TaskState.load": [
+                "?*.exists",
+                "?open",
+                "tools.py::TaskState.reset",
+                "?json.load"
+            ],
+            "tools.py::TaskState.reset": [
+                "?uuid.uuid4",
+                "?*.isoformat",
+                "tools.py::TaskState.save",
+                "?str",
+                "?datetime.now"
+            ],
+            "tools.py::TaskState.save": [
+                "?open",
+                "?datetime.now",
+                "?json.dump",
+                "?*.isoformat"
+            ],
+            "tools.py::TaskState.log_tool": [
+                "tools.py::TaskState.save",
+                "?*.append"
+            ],
+            "tools.py::TaskState.log_file_inspected": [
+                "tools.py::TaskState.save",
+                "?*.append"
+            ],
+            "tools.py::TaskState.log_file_modified": [
+                "tools.py::TaskState.save",
+                "?*.append"
+            ],
+            "tools.py::TaskState.log_verification": [
+                "tools.py::TaskState.save",
+                "?*.append"
+            ],
+            "tools.py::TaskState.log_error": [
+                "tools.py::TaskState.save",
+                "?*.append"
+            ],
+            "tools.py::RepoIndexer.__init__": [
+                "?os.makedirs"
+            ],
+            "tools.py::RepoIndexer._extract_ast_info": [
+                "?ast.unparse",
+                "?set",
+                "?isinstance",
+                "?list",
+                "?extract_calls",
+                "?str",
+                "?methods.append",
+                "?hasattr",
+                "?ast.walk",
+                "?ast.parse",
+                "?calls.append",
+                "?f.read",
+                "?open",
+                "?ast.iter_child_nodes",
+                "?*.append",
+                "?decs.append"
+            ],
+            "tools.py::RepoIndexer.build_index": [
+                "?index.get",
+                "?range",
+                "?*.splitext",
+                "?*.items",
+                "?s.split",
+                "?json.dump",
+                "?c.replace",
+                "?imp.split",
+                "tools.py::RepoIndexer._extract_ast_info",
+                "?len",
+                "?func_info.get",
+                "?d.startswith",
+                "?info.get",
+                "?*.append",
+                "?c.startswith",
+                "?cls_info.get",
+                "?os.walk",
+                "?*.endswith",
+                "?f.replace",
+                "?resolve_call",
+                "?m.get",
+                "?any",
+                "?target.startswith",
+                "?open",
+                "?*.relpath",
+                "?*.join",
+                "?file.endswith",
+                "?*.replace",
+                "?s.startswith",
+                "?*.lower",
+                "?file.startswith",
+                "?s_file.replace",
+                "?call_str.rsplit"
+            ],
+            "tools.py::RepoIndexer.query": [
+                "?index.get",
+                "?target.split",
+                "?*.items",
+                "?*.exists",
+                "?x.split",
+                "tools.py::RepoIndexer.build_index",
+                "?out.append",
+                "?*.strip",
+                "?len",
+                "?sorted",
+                "?indirect_impacts.discard",
+                "?info.get",
+                "?json.load",
+                "?set",
+                "?indirect_impacts.update",
+                "?query_type.startswith",
+                "?open",
+                "?*.join",
+                "?query_type.split",
+                "?*.get",
+                "?graph.get",
+                "?uncertain_impacts.update",
+                "?direct_impacts.update",
+                "?x.startswith"
+            ]
+        },
+        "inbound": {
+            "app.py::load_chats_db": [
+                "app.py::get_or_create_session",
+                "app.py::get_sessions",
+                "app.py::update_session_title",
+                "app.py::update_session_pin",
+                "app.py::delete_session",
+                "app.py::create_session",
+                "app.py::get_history",
+                "app.py::chat"
+            ],
+            "app.py::save_chats_db": [
+                "app.py::update_session_title",
+                "app.py::update_session_pin",
+                "app.py::delete_session",
+                "app.py::create_session",
+                "app.py::chat"
+            ],
+            "app.py::get_config": [
+                "app.py::get_or_create_session"
+            ],
+            "app.py::init_client": [
+                "app.py::get_or_create_session"
+            ],
+            "app.py::get_or_create_session": [
+                "app.py::chat"
+            ],
+            "app.py::index": [],
+            "app.py::get_sessions": [],
+            "app.py::update_session_title": [],
+            "app.py::update_session_pin": [],
+            "app.py::delete_session": [],
+            "app.py::create_session": [],
+            "app.py::get_history": [],
+            "app.py::chat": [],
+            "app.py::stop": [],
+            "tools.py::read_file": [],
+            "tools.py::_run_automated_tests": [
+                "tools.py::create_file",
+                "tools.py::edit_file"
+            ],
+            "tools.py::create_file": [],
+            "tools.py::edit_file": [],
+            "tools.py::run_verification": [],
+            "tools.py::list_directory": [],
+            "tools.py::grep_search": [],
+            "tools.py::git_checkpoint": [],
+            "tools.py::git_rollback": [],
+            "tools.py::execute_command": [],
+            "tools.py::search_web": [],
+            "tools.py::run_python_code": [],
+            "tools.py::update_plan": [],
+            "tools.py::update_task_status": [],
+            "tools.py::query_repo_index": [],
+            "tools.py::TaskState.__init__": [],
+            "tools.py::TaskState.load": [
+                "tools.py::TaskState.__init__"
+            ],
+            "tools.py::TaskState.reset": [
+                "tools.py::TaskState.load"
+            ],
+            "tools.py::TaskState.save": [
+                "tools.py::TaskState.reset",
+                "tools.py::TaskState.log_tool",
+                "tools.py::TaskState.log_file_inspected",
+                "tools.py::TaskState.log_file_modified",
+                "tools.py::TaskState.log_verification",
+                "tools.py::TaskState.log_error"
+            ],
+            "tools.py::TaskState.log_tool": [],
+            "tools.py::TaskState.log_file_inspected": [],
+            "tools.py::TaskState.log_file_modified": [],
+            "tools.py::TaskState.log_verification": [],
+            "tools.py::TaskState.log_error": [],
+            "tools.py::RepoIndexer.__init__": [],
+            "tools.py::RepoIndexer._extract_ast_info": [
+                "tools.py::RepoIndexer.build_index"
+            ],
+            "tools.py::RepoIndexer.build_index": [
+                "tools.py::RepoIndexer.query"
+            ],
+            "tools.py::RepoIndexer.query": []
+        }
+    }
+}

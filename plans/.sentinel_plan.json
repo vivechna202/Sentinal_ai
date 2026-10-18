@@ -1,0 +1,16 @@
+{
+    "task_goal": "Create hello.py",
+    "steps": [
+        "Create file",
+        "Verify"
+    ],
+    "files_affected": [
+        "hello.py"
+    ],
+    "tools_used": [
+        "create_file"
+    ],
+    "verification_steps": [
+        "Check output"
+    ]
+}

@@ -8,5 +8,27 @@
                 "content": "Hello! I am your SWE-agent. How can I help you build today?"
             }
         ]
+    },
+    "7ad04e47-b08f-48cc-b6d3-0e0bc6601bd8": {
+        "title": "Create a simple Python script ...",
+        "updated_at": "2026-09-27T10:26:39.610009",
+        "history": [
+            {
+                "role": "assistant",
+                "content": "Hello! I am your SWE-agent. How can I help you build today?"
+            },
+            {
+                "role": "user",
+                "content": "Create a simple Python script named calculator.py with an add function."
+            },
+            {
+                "role": "assistant",
+                "content": ""
+            }
+        ]
+    },
+    "test_session_123": {
+        "title": "Test",
+        "history": []
     }
 }

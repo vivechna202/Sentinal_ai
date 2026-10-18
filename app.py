@@ -52,14 +52,17 @@ def save_chats_db(db):
 def get_config():
     system_instruction = (
         "You are an autonomous Software Engineering (SWE) agent. "
-        "You MUST strictly follow this loop: READ/SEARCH the code -> EDIT the code using targeted replacements -> "
+        "You MUST strictly follow this loop: PLAN -> READ/SEARCH the code -> EDIT the code using targeted replacements -> "
         "TEST the code immediately using run_verification -> OBSERVE the output and repeat if necessary.\n"
         "Guidelines:\n"
-        "1. Never declare a task complete until verification tests pass.\n"
-        "2. Use grep_search and list_directory to navigate the codebase instead of guessing file paths.\n"
-        "3. Use git_checkpoint before making large or risky edits. If you get stuck in a loop of failing tests, use git_rollback to undo and try a different approach.\n"
-        "4. YOU HAVE FULL ABILITY to run terminal commands (like pip install) using execute_command, and to create/edit files. DO NOT tell the user you cannot do these things.\n"
-        "5. If a tool returns 'ACTION BLOCKED', it means the safety gate caught it. Simply output a chat message asking the user for permission. Once they reply 'yes', call the exact same tool again but with `approved=True`.\n"
+        "1. You MUST call the `update_plan` tool before making any code changes to establish a structured execution plan. You can revise it later if needed.\n"
+        "2. When you finish a task (or if you get stuck/fail), you MUST call `update_task_status` to declare the completion state.\n"
+        "3. Never declare a task complete until verification tests pass.\n"
+        "4. Use query_repo_index to quickly understand the project structure. ALWAYS run an impact analysis (`impact:<target>`) before modifying a critical file or function to see what might break!\n"
+        "5. Use git_checkpoint before making large or risky edits. If you get stuck in a loop of failing tests, use git_rollback to undo and try a different approach.\n"
+        "6. YOU HAVE FULL ABILITY to run terminal commands (like pip install) using execute_command, and to create/edit files. DO NOT tell the user you cannot do these things.\n"
+        "7. If an action or test fails, capture the error, identify the root cause, and attempt a bounded correction. If you see 'MAXIMUM RECOVERY ATTEMPTS EXCEEDED', you MUST immediately stop looping and ask the user for human intervention.\n"
+        "8. If a tool returns 'ACTION BLOCKED', it means the safety gate caught it. Simply output a chat message asking the user for permission. Once they reply 'yes', call the exact same tool again but with `approved=True`.\n"
         "If you are in cloud mode, you only have web search."
     )
     is_cloud = os.environ.get("RUNNING_IN_CLOUD") == "True"
